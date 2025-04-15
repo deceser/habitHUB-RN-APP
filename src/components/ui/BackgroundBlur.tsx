@@ -1,9 +1,9 @@
-import React from "react";
-import { View } from "react-native";
-import { blurElementStyles } from "../../constants/blurElements";
+import React from 'react';
+import { View } from 'react-native';
+import { blurElementStyles } from '../../constants/blurElements';
 
 /**
- * Компонент для отображения размытых градиентных кругов в фоне
+ * Component for displaying blurred gradient circles in the background
  */
 export const BackgroundBlur: React.FC = () => {
   return (

@@ -1,9 +1,9 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
-// Базовые стили для размытых элементов
+// Base styles for blurred elements
 export const baseBlurStyles = StyleSheet.create({
   blurCircle: {
-    position: "absolute",
+    position: 'absolute',
     width: 250,
     height: 250,
     borderRadius: 125,
@@ -11,11 +11,11 @@ export const baseBlurStyles = StyleSheet.create({
   },
 });
 
-// Дополнительные стили для разных размытых элементов
+// Additional styles for different blur elements
 export const blurElementStyles = StyleSheet.create({
   pinkBlur: {
     ...baseBlurStyles.blurCircle,
-    backgroundColor: "rgba(241, 220, 255, 0.5)",
+    backgroundColor: 'rgba(241, 220, 255, 0.5)',
     top: -120,
     right: -100,
     width: 300,
@@ -24,8 +24,8 @@ export const blurElementStyles = StyleSheet.create({
   },
   blueBigBlur: {
     ...baseBlurStyles.blurCircle,
-    backgroundColor: "rgba(200, 230, 255, 0.6)",
-    top: "50%",
+    backgroundColor: 'rgba(200, 230, 255, 0.6)',
+    top: '50%',
     left: -125,
     width: 280,
     height: 280,
@@ -33,8 +33,8 @@ export const blurElementStyles = StyleSheet.create({
   },
   blueSmallBlur: {
     ...baseBlurStyles.blurCircle,
-    backgroundColor: "rgba(210, 240, 255, 0.55)",
-    bottom: "10%",
+    backgroundColor: 'rgba(210, 240, 255, 0.55)',
+    bottom: '10%',
     right: -50,
     width: 170,
     height: 170,
@@ -43,9 +43,9 @@ export const blurElementStyles = StyleSheet.create({
   // Дополнительное фиолетовое пятно для глубины дизайна
   purpleBlur: {
     ...baseBlurStyles.blurCircle,
-    backgroundColor: "rgba(232, 225, 255, 0.5)",
-    bottom: "35%",
-    right: "15%",
+    backgroundColor: 'rgba(232, 225, 255, 0.5)',
+    bottom: '35%',
+    right: '15%',
     width: 200,
     height: 200,
     borderRadius: 100,

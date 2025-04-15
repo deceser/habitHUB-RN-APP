@@ -1,16 +1,13 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { textStyles } from "../../constants/styles";
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { textStyles } from '../../constants/styles';
 
 interface AuthHeaderProps {
   titleLines: string[];
   subtitle: string;
 }
 
-export const AuthHeader: React.FC<AuthHeaderProps> = ({
-  titleLines,
-  subtitle,
-}) => {
+export const AuthHeader: React.FC<AuthHeaderProps> = ({ titleLines, subtitle }) => {
   return (
     <View style={styles.container}>
       {titleLines.map((line, index) => (
