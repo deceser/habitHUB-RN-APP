@@ -1,12 +1,7 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableOpacityProps,
-} from "react-native";
-import { commonStyles, textStyles } from "../../constants/styles";
-import { theme } from "../../constants/theme";
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, TouchableOpacityProps } from 'react-native';
+import { commonStyles, textStyles } from '../../constants/styles';
+import { theme } from '../../constants/theme';
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
@@ -25,7 +20,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.loginButton,
     borderRadius: 12,
     paddingVertical: 14,
-    alignItems: "center",
+    alignItems: 'center',
     ...commonStyles.shadow,
   },
 });
