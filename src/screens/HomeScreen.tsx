@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { StyleSheet, View, StatusBar, SafeAreaView, ScrollView } from 'react-native';
 
 import { GradientContainer } from '../components/ui/GradientContainer';
@@ -7,8 +7,25 @@ import { EmptyStateIllustration } from '../assets/images/EmptyStateIllustration'
 import { DayItem } from '../components/ui/DayItem';
 import { FilterChip } from '../components/ui/FilterChip';
 import { FloatingActionButton } from '../components/ui/FloatingActionButton';
+import { getWeekDates } from '../utils/dateUtils';
 
 export const HomeScreen = () => {
+  const weekDays = useMemo(() => getWeekDates(), []);
+  const [activeDate, setActiveDate] = useState<string>(() => {
+    const today = weekDays.find(day => day.isToday);
+    return today ? today.fullDate : weekDays[0].fullDate;
+  });
+
+  const handleDayPress = useCallback(
+    (fullDate: string) => {
+      setActiveDate(fullDate);
+      const selectedDay = weekDays.find(day => day.fullDate === fullDate);
+
+      console.log(`Selected day: ${selectedDay?.dayName}, date: ${fullDate}`);
+    },
+    [weekDays],
+  );
+
   return (
     <GradientContainer vertical>
       <StatusBar barStyle="dark-content" />
@@ -21,13 +38,16 @@ export const HomeScreen = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.daysContainer}
             >
-              <DayItem day="Sun" date="10" isActive={true} />
-              <DayItem day="Mon" date="11" isActive={false} />
-              <DayItem day="Tue" date="12" isActive={false} />
-              <DayItem day="Wed" date="13" isActive={false} />
-              <DayItem day="Thu" date="14" isActive={false} />
-              <DayItem day="Fri" date="15" isActive={false} />
-              <DayItem day="Sat" date="16" isActive={false} />
+              {weekDays.map(day => (
+                <DayItem
+                  key={day.fullDate}
+                  day={day.dayName}
+                  date={day.dayNumber}
+                  isActive={day.fullDate === activeDate}
+                  fullDate={day.fullDate}
+                  onPress={handleDayPress}
+                />
+              ))}
             </ScrollView>
 
             {/* Filter Chips */}
