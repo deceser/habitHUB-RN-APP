@@ -1,19 +1,25 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
 interface DayItemProps {
   day: string;
   date: string;
   isActive: boolean;
+  fullDate?: string;
+  onPress?: (fullDate: string) => void;
 }
 
-export const DayItem = ({ day, date, isActive }: DayItemProps) => (
-  <View style={[styles.dayItem, isActive ? styles.activeDayItem : styles.inactiveDayItem]}>
+export const DayItem = ({ day, date, isActive, fullDate, onPress }: DayItemProps) => (
+  <TouchableOpacity
+    style={[styles.dayItem, isActive ? styles.activeDayItem : styles.inactiveDayItem]}
+    onPress={() => fullDate && onPress && onPress(fullDate)}
+    disabled={!onPress}
+  >
     <Text style={[styles.dayText, isActive && styles.activeDayText]}>{day}</Text>
     <View style={styles.dateCircle}>
       <Text style={[styles.dateText, isActive && styles.activeDayText]}>{date}</Text>
     </View>
-  </View>
+  </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
