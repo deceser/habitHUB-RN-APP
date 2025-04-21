@@ -15,7 +15,7 @@ export const loginContent = {
   },
 };
 
-// Контент для экрана ввода логина и пароля
+// Content for the login and password input screen
 export const signInContent = {
   title: 'Sign In',
   subtitle: 'Welcome back! Please enter your details',
