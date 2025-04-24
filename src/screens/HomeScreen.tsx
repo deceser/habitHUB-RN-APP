@@ -8,6 +8,8 @@ import { DayItem } from '../components/ui/DayItem';
 import { FilterChip } from '../components/ui/FilterChip';
 import { FloatingActionButton } from '../components/ui/FloatingActionButton';
 import { getWeekDates } from '../utils/dateUtils';
+import { HabitList } from '../components/habit/HabitList';
+import { HabitItemProps } from '../components/habit/HabitItem';
 
 export const HomeScreen = () => {
   const weekDays = useMemo(() => getWeekDates(), []);
@@ -15,6 +17,21 @@ export const HomeScreen = () => {
     const today = weekDays.find(day => day.isToday);
     return today ? today.fullDate : weekDays[0].fullDate;
   });
+
+  const [habits, setHabits] = useState<Omit<HabitItemProps, 'onPress'>[]>([
+    {
+      id: '1',
+      title: 'Read',
+      emoji: '📖',
+      completed: false,
+    },
+    {
+      id: '2',
+      title: 'Meditate',
+      emoji: '🧘',
+      completed: true,
+    },
+  ]);
 
   const handleDayPress = useCallback(
     (fullDate: string) => {
@@ -25,6 +42,15 @@ export const HomeScreen = () => {
     },
     [weekDays],
   );
+
+  const handleHabitPress = useCallback((id: string) => {
+    setHabits(prevHabits =>
+      prevHabits.map(habit =>
+        habit.id === id ? { ...habit, completed: !habit.completed } : habit,
+      ),
+    );
+    console.log(`Habit pressed: ${id}`);
+  }, []);
 
   return (
     <GradientContainer vertical>
@@ -59,9 +85,15 @@ export const HomeScreen = () => {
           </View>
 
           {/* Empty State */}
-          <View style={styles.emptyStateContainer}>
-            <EmptyStateIllustration useSvg={true} size={340} />
-          </View>
+          {habits.length === 0 ? (
+            <View style={styles.emptyStateContainer}>
+              <EmptyStateIllustration useSvg={true} size={340} />
+            </View>
+          ) : (
+            <View style={styles.habitListContainer}>
+              <HabitList habits={habits} onHabitPress={handleHabitPress} />
+            </View>
+          )}
 
           {/* Floating Action Button */}
           <FloatingActionButton onPress={() => console.log('FAB pressed')} />
@@ -101,5 +133,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 56,
+  },
+
+  habitListContainer: {
+    flex: 1,
   },
 });

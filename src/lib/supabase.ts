@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { createClient } from '@supabase/supabase-js';
 import Constants from 'expo-constants';
 
-// Адаптер для безопасного хранения токенов
+// Adapter for secure token storage
 const ExpoSecureStoreAdapter = {
   getItem: (key: string) => {
     return SecureStore.getItemAsync(key);
@@ -16,7 +16,7 @@ const ExpoSecureStoreAdapter = {
   },
 };
 
-// Получение конфигурации Supabase из переменных окружения
+// Getting the Supabase configuration from environment variables
 const supabaseUrl =
   Constants.expoConfig?.extra?.supabaseUrl || process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey =
@@ -24,11 +24,11 @@ const supabaseAnonKey =
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
-    'Supabase URL или ключ не настроены. Убедитесь, что вы добавили их в переменные окружения или app.config.js',
+    'Supabase URL or key is not configured. Please ensure you have added them to environment variables or app.config.js',
   );
 }
 
-// Создание клиента Supabase
+// Creating the Supabase client
 export const supabase = createClient(supabaseUrl as string, supabaseAnonKey as string, {
   auth: {
     storage: ExpoSecureStoreAdapter,
@@ -38,13 +38,13 @@ export const supabase = createClient(supabaseUrl as string, supabaseAnonKey as s
   },
 });
 
-// Проверка авторизации пользователя
+// Checking user authentication
 export const isAuthenticated = async (): Promise<boolean> => {
   const { data } = await supabase.auth.getSession();
   return !!data.session;
 };
 
-// Получение текущего пользователя
+// Getting the current user
 export const getCurrentUser = async () => {
   const { data } = await supabase.auth.getUser();
   return data.user;

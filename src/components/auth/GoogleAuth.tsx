@@ -19,11 +19,11 @@ export const GoogleAuth: React.FC<GoogleAuthProps> = ({ onSuccess, onError }) =>
     try {
       setLoading(true);
 
-      // Запускаем процесс авторизации через Google в Supabase
+      // Starting the Google authorization process in Supabase
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          // Настройки для запроса доступа к offline данным и принудительного показа диалога согласия
+          // Settings for requesting access to offline data and forcing the consent dialog to show
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -34,29 +34,29 @@ export const GoogleAuth: React.FC<GoogleAuthProps> = ({ onSuccess, onError }) =>
       if (error) throw error;
 
       if (data?.url) {
-        // Открываем URL в браузере
+        // Opening the URL in the browser
         const result = await WebBrowser.openAuthSessionAsync(data.url);
 
         if (result.type === 'success') {
-          // Проверяем, что авторизация прошла успешно
+          // Checking if the authorization was successful
           const { data: sessionData } = await supabase.auth.getSession();
 
           if (sessionData.session) {
-            // Вызываем колбэк успешной авторизации
+            // Calling the success callback
             onSuccess?.();
           } else {
-            throw new Error('Не удалось получить сессию после авторизации');
+            throw new Error('Failed to get session after authorization');
           }
         } else if (result.type === 'cancel') {
-          // Пользователь отменил процесс авторизации
-          console.log('Авторизация была отменена пользователем');
+          // The user canceled the authorization process
+          console.log('Authorization was canceled by the user');
         }
       }
     } catch (error) {
-      console.error('Ошибка при авторизации через Google:', error);
+      console.error('Error during Google authorization:', error);
 
       if (error instanceof Error) {
-        Alert.alert('Ошибка авторизации', error.message);
+        Alert.alert('Authorization error', error.message);
         onError?.(error);
       }
     } finally {

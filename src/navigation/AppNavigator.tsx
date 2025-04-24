@@ -22,7 +22,7 @@ export const AppNavigator = () => {
   useEffect(() => {
     // Detect the initial route based on the authentication status
     if (!loading) {
-      setInitialRoute(user ? 'MainTabs' : 'Login');
+      setInitialRoute(!user ? 'MainTabs' : 'Login');
     }
   }, [user, loading]);
 

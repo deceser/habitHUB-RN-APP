@@ -45,20 +45,20 @@ export const SocialAuth: React.FC = () => {
           const { data: sessionData } = await supabase.auth.getSession();
 
           if (sessionData.session) {
-            // Переходим на главный экран
+            // Navigate to the main screen
             navigation.navigate('MainTabs');
           } else {
-            throw new Error('Не удалось получить сессию после авторизации');
+            throw new Error('Failed to get session after authorization');
           }
         } else if (result.type === 'cancel') {
-          console.log('Авторизация была отменена пользователем');
+          console.log('Authorization was canceled by the user');
         }
       }
     } catch (error) {
-      console.error('Ошибка при авторизации через Google:', error);
+      console.error('Error during Google authorization:', error);
 
       if (error instanceof Error) {
-        Alert.alert('Ошибка авторизации', error.message);
+        Alert.alert('Authorization error', error.message);
       }
     } finally {
       setGoogleLoading(false);
