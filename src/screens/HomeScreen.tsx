@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback, useState } from 'react';
-import { StyleSheet, View, StatusBar, SafeAreaView, ScrollView } from 'react-native';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import { StyleSheet, View, StatusBar, SafeAreaView, ScrollView, Text } from 'react-native';
 
 import { GradientContainer } from '../components/ui/GradientContainer';
 import { commonStyles } from '../constants/styles';
@@ -7,50 +7,63 @@ import { EmptyStateIllustration } from '../assets/images/EmptyStateIllustration'
 import { DayItem } from '../components/ui/DayItem';
 import { FilterChip } from '../components/ui/FilterChip';
 import { FloatingActionButton } from '../components/ui/FloatingActionButton';
-import { getWeekDates } from '../utils/dateUtils';
+import { getWeekDates, generateDemoHabits, formatDate, HabitsByDate } from '../utils/dateUtils';
 import { HabitList } from '../components/habit/HabitList';
-import { HabitItemProps } from '../components/habit/HabitItem';
 
 export const HomeScreen = () => {
+  // Get days of the current week
   const weekDays = useMemo(() => getWeekDates(), []);
+
+  // Set active date (default - today)
   const [activeDate, setActiveDate] = useState<string>(() => {
     const today = weekDays.find(day => day.isToday);
     return today ? today.fullDate : weekDays[0].fullDate;
   });
 
-  const [habits, setHabits] = useState<Omit<HabitItemProps, 'onPress'>[]>([
-    {
-      id: '1',
-      title: 'Read',
-      emoji: '📖',
-      completed: false,
-    },
-    {
-      id: '2',
-      title: 'Meditate',
-      emoji: '🧘',
-      completed: true,
-    },
-  ]);
+  // Create state for storing habits by dates
+  const [habitsByDate, setHabitsByDate] = useState<HabitsByDate>({});
 
+  // Load demo data on first render
+  useEffect(() => {
+    setHabitsByDate(generateDemoHabits());
+  }, []);
+
+  // Get habits for active date
+  const activeHabits = useMemo(() => habitsByDate[activeDate] || [], [habitsByDate, activeDate]);
+
+  // Format date for display
+  const formattedActiveDate = useMemo(() => formatDate(activeDate), [activeDate]);
+
+  // Handler for day press
   const handleDayPress = useCallback(
     (fullDate: string) => {
       setActiveDate(fullDate);
       const selectedDay = weekDays.find(day => day.fullDate === fullDate);
-
       console.log(`Selected day: ${selectedDay?.dayName}, date: ${fullDate}`);
     },
     [weekDays],
   );
 
-  const handleHabitPress = useCallback((id: string) => {
-    setHabits(prevHabits =>
-      prevHabits.map(habit =>
-        habit.id === id ? { ...habit, completed: !habit.completed } : habit,
-      ),
-    );
-    console.log(`Habit pressed: ${id}`);
-  }, []);
+  // Handler for habit press
+  const handleHabitPress = useCallback(
+    (id: string) => {
+      setHabitsByDate(prev => {
+        // Copy current state
+        const updated = { ...prev };
+
+        // Update only habits for selected date
+        if (updated[activeDate]) {
+          updated[activeDate] = updated[activeDate].map(habit =>
+            habit.id === id ? { ...habit, completed: !habit.completed } : habit,
+          );
+        }
+
+        return updated;
+      });
+      console.log(`Habit pressed: ${id}`);
+    },
+    [activeDate],
+  );
 
   return (
     <GradientContainer vertical>
@@ -58,7 +71,7 @@ export const HomeScreen = () => {
       <SafeAreaView style={commonStyles.container}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
-            {/* Days */}
+            {/* Days of the week */}
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -76,7 +89,7 @@ export const HomeScreen = () => {
               ))}
             </ScrollView>
 
-            {/* Filter Chips */}
+            {/* Filters */}
             <View style={styles.filtersContainer}>
               <FilterChip label="All" isActive={true} />
               <FilterChip label="Daily Routine" isActive={false} />
@@ -84,18 +97,18 @@ export const HomeScreen = () => {
             </View>
           </View>
 
-          {/* Empty State */}
-          {habits.length === 0 ? (
+          {/* Display list of habits or empty state */}
+          {activeHabits.length === 0 ? (
             <View style={styles.emptyStateContainer}>
               <EmptyStateIllustration useSvg={true} size={340} />
             </View>
           ) : (
             <View style={styles.habitListContainer}>
-              <HabitList habits={habits} onHabitPress={handleHabitPress} />
+              <HabitList habits={activeHabits} onHabitPress={handleHabitPress} />
             </View>
           )}
 
-          {/* Floating Action Button */}
+          {/* Add button */}
           <FloatingActionButton onPress={() => console.log('FAB pressed')} />
         </View>
       </SafeAreaView>
@@ -110,31 +123,40 @@ const styles = StyleSheet.create({
     position: 'relative',
     paddingBottom: 80,
   },
-
   headerContainer: {
     flexDirection: 'column',
   },
-
   filtersContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 0,
+    marginBottom: 16,
   },
-
   daysContainer: {
     flexDirection: 'row',
     marginTop: 16,
     marginBottom: 36,
   },
-
+  dateTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 16,
+    color: '#444',
+  },
   emptyStateContainer: {
-    alignContent: 'center',
-    justifyContent: 'center',
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 56,
   },
-
+  emptyStateText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#888',
+    textAlign: 'center',
+  },
   habitListContainer: {
     flex: 1,
   },
