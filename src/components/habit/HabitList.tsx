@@ -1,15 +1,16 @@
 import React from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
-import { HabitItem, HabitItemProps } from './HabitItem';
+import { HabitItem } from './HabitItem';
 import { EmptyStateIllustration } from '../../assets/images/EmptyStateIllustration';
+import { Habit } from '../../utils/dateUtils';
 
 export interface HabitListProps {
-  habits: Omit<HabitItemProps, 'onPress'>[];
+  habits: Habit[];
   onHabitPress?: (id: string) => void;
 }
 
 export const HabitList: React.FC<HabitListProps> = ({ habits, onHabitPress }) => {
-  const hasHabits = habits.length > 0;
+  const hasHabits = habits && habits.length > 0;
 
   if (!hasHabits) {
     return (
@@ -29,7 +30,8 @@ export const HabitList: React.FC<HabitListProps> = ({ habits, onHabitPress }) =>
           title={item.title}
           emoji={item.emoji}
           completed={item.completed}
-          onPress={() => onHabitPress && onHabitPress(item.id)}
+          date={item.date}
+          onPress={onHabitPress}
         />
       )}
       contentContainerStyle={styles.listContainer}

@@ -1,13 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Checkbox } from '../ui/Checkbox';
+import { Habit } from '../../utils/dateUtils';
 
-export interface HabitItemProps {
-  id: string;
-  title: string;
-  emoji: string;
-  completed?: boolean;
-  onPress?: () => void;
+export interface HabitItemProps extends Habit {
+  onPress?: (id: string) => void;
 }
 
 export const HabitItem: React.FC<HabitItemProps> = ({
@@ -20,7 +17,7 @@ export const HabitItem: React.FC<HabitItemProps> = ({
   return (
     <TouchableOpacity
       style={[styles.container, completed && styles.completedContainer]}
-      onPress={onPress}
+      onPress={() => onPress && onPress(id)}
       activeOpacity={0.8}
     >
       <View style={styles.emojiContainer}>
@@ -31,7 +28,7 @@ export const HabitItem: React.FC<HabitItemProps> = ({
       </Text>
       <Checkbox
         checked={completed}
-        onPress={onPress || (() => {})}
+        onPress={() => onPress && onPress(id)}
         size={20}
         containerStyle={styles.checkboxContainer}
       />
