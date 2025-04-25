@@ -8,6 +8,7 @@ export type RootStackParamList = {
   SignUp: undefined;
   MainTabs: undefined;
   Details: { id: string };
+  NewTask: undefined;
 };
 
 export type TabParamList = {

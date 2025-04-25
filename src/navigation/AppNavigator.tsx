@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { LoginScreen } from '../screens/LoginScreen';
 import { SignInScreen } from '../screens/SignInScreen';
 import { SignUpScreen } from '../screens/SignUpScreen';
+import { NewTaskScreen } from '../screens/NewTaskScreen';
 
 import { RootStackParamList } from './types';
 
@@ -44,6 +45,14 @@ export const AppNavigator = () => {
         initialRouteName={initialRoute}
       >
         <Stack.Screen name="MainTabs" component={TabNavigator} />
+        <Stack.Screen
+          name="NewTask"
+          component={NewTaskScreen}
+          options={{
+            presentation: 'fullScreenModal',
+            animation: 'slide_from_bottom',
+          }}
+        />
 
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignIn" component={SignInScreen} />

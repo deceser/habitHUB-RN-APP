@@ -109,7 +109,7 @@ export const HomeScreen = () => {
           )}
 
           {/* Add button */}
-          <FloatingActionButton onPress={() => console.log('FAB pressed')} />
+          <FloatingActionButton />
         </View>
       </SafeAreaView>
     </GradientContainer>
