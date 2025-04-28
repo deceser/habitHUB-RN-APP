@@ -1,16 +1,30 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { RootStackScreenProps } from '../../navigation/types';
 
 interface FloatingActionButtonProps {
   onPress?: () => void;
   label?: string;
 }
 
-export const FloatingActionButton = ({ onPress, label = '+' }: FloatingActionButtonProps) => (
-  <TouchableOpacity style={styles.fab} onPress={onPress}>
-    <Text style={styles.fabText}>{label}</Text>
-  </TouchableOpacity>
-);
+export const FloatingActionButton = ({ onPress, label = '+' }: FloatingActionButtonProps) => {
+  const navigation = useNavigation<RootStackScreenProps<'MainTabs'>['navigation']>();
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      navigation.navigate('NewTask');
+    }
+  };
+
+  return (
+    <TouchableOpacity style={styles.fab} onPress={handlePress}>
+      <Text style={styles.fabText}>{label}</Text>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   fab: {
