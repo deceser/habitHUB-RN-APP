@@ -4,14 +4,10 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { HomeScreen } from '../screens/HomeScreen';
 import { View, StyleSheet, Text } from 'react-native';
 import { TabParamList } from './types';
+import { CalendarScreen } from '../screens/CalendarScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-const CalendarScreen = () => (
-  <View style={styles.placeholder}>
-    <Text>Calendar Screen</Text>
-  </View>
-);
 const ProfileScreen = () => (
   <View style={styles.placeholder}>
     <Text>Profile Screen</Text>
