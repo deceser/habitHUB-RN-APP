@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity } fr
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
 import { GradientContainer } from '../components/ui/GradientContainer';
-
+import { HabitItem } from '../components/habit/HabitItem';
 interface DayProps {
   day: string;
   date: string;
@@ -28,18 +28,18 @@ const Day: React.FC<DayProps> = ({ day, date, isCurrentMonth, isSelected, onPres
   </TouchableOpacity>
 );
 
-const HabitItem: React.FC<{ title: string; emoji: string }> = ({ title, emoji }) => (
-  <View style={styles.habitItem}>
-    <View style={styles.habitContent}>
-      <Text style={styles.habitEmoji}>{emoji}</Text>
-      <Text style={styles.habitTitle}>{title}</Text>
-    </View>
-    <View style={styles.statusDots}>
-      <View style={styles.emptyDot} />
-      <View style={styles.filledDot} />
-    </View>
-  </View>
-);
+// const HabitItem: React.FC<{ title: string; emoji: string }> = ({ title, emoji }) => (
+//   <View style={styles.habitItem}>
+//     <View style={styles.habitContent}>
+//       <Text style={styles.habitEmoji}>{emoji}</Text>
+//       <Text style={styles.habitTitle}>{title}</Text>
+//     </View>
+//     <View style={styles.statusDots}>
+//       <View style={styles.emptyDot} />
+//       <View style={styles.filledDot} />
+//     </View>
+//   </View>
+// );
 
 const DatePanel: React.FC<{ date: string }> = ({ date }) => (
   <View style={styles.datePanel}>
@@ -156,16 +156,16 @@ export const CalendarScreen = () => {
           {/* Habit Lists by Date */}
           <View style={styles.habitsContainer}>
             <DatePanel date="February, 15th, Thu" />
-            <HabitItem title="Read" emoji="📖" />
-            <HabitItem title="Read" emoji="📖" />
+            <HabitItem title="Read" emoji="📖" completed={true} id="1" date="2024-02-15" />
+            <HabitItem title="Read" emoji="📖" completed={false} id="2" date="2024-02-15" />
 
             <DatePanel date="February, 16th, Fri" />
-            <HabitItem title="Read" emoji="📖" />
-            <HabitItem title="Read" emoji="📖" />
+            <HabitItem title="Read" emoji="📖" completed={true} id="1" date="2024-02-16" />
+            <HabitItem title="Read" emoji="📖" completed={false} id="2" date="2024-02-16" />
 
             <DatePanel date="This week" />
-            <HabitItem title="Read" emoji="📖" />
-            <HabitItem title="Read" emoji="📖" />
+            <HabitItem title="Read" emoji="📖" completed={true} id="1" date="2024-02-17" />
+            <HabitItem title="Read" emoji="📖" completed={false} id="2" date="2024-02-17" />
           </View>
         </ScrollView>
 
