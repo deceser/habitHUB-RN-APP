@@ -1,5 +1,13 @@
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
-import { StyleSheet, View, StatusBar, SafeAreaView, ScrollView, Text } from 'react-native';
+import React, { useMemo, useCallback, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  StatusBar,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
 
 import { GradientContainer } from '../components/ui/GradientContainer';
 import { commonStyles } from '../constants/styles';
@@ -7,8 +15,10 @@ import { EmptyStateIllustration } from '../assets/images/EmptyStateIllustration'
 import { DayItem } from '../components/ui/DayItem';
 import { FilterChip } from '../components/ui/FilterChip';
 import { FloatingActionButton } from '../components/ui/FloatingActionButton';
-import { getWeekDates, generateDemoHabits, formatDate, HabitsByDate } from '../utils/dateUtils';
+import { getWeekDates, formatDate, HabitsByDate, Habit } from '../utils/dateUtils';
 import { HabitList } from '../components/habit/HabitList';
+import { getHabitsForWeek, updateHabitStatus } from '../services/habitService';
+import { useFocusEffect } from '@react-navigation/native';
 
 export const HomeScreen = () => {
   // Get days of the current week
@@ -22,48 +32,98 @@ export const HomeScreen = () => {
 
   // Create state for storing habits by dates
   const [habitsByDate, setHabitsByDate] = useState<HabitsByDate>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [activeTag, setActiveTag] = useState<string>('All');
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Load demo data on first render
-  useEffect(() => {
-    setHabitsByDate(generateDemoHabits());
-  }, []);
+  // Load habits for the current week from Supabase
+  const loadHabits = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError(null);
 
-  // Get habits for active date
-  const activeHabits = useMemo(() => habitsByDate[activeDate] || [], [habitsByDate, activeDate]);
+    try {
+      const firstDay = weekDays[0].fullDate;
+      const lastDay = weekDays[6].fullDate;
 
-  // Format date for display
-  const formattedActiveDate = useMemo(() => formatDate(activeDate), [activeDate]);
+      const habits = await getHabitsForWeek(firstDay, lastDay);
 
-  // Handler for day press
-  const handleDayPress = useCallback(
-    (fullDate: string) => {
-      setActiveDate(fullDate);
-      const selectedDay = weekDays.find(day => day.fullDate === fullDate);
-      console.log(`Selected day: ${selectedDay?.dayName}, date: ${fullDate}`);
-    },
-    [weekDays],
+      setHabitsByDate(habits);
+    } catch (error) {
+      console.error('Error loading habits:', error);
+      setLoadError('Не удалось загрузить задачи. Проверьте соединение.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [weekDays]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadHabits();
+    }, [loadHabits]),
   );
 
-  // Handler for habit press
+  const activeHabits = useMemo(() => {
+    const habits = habitsByDate[activeDate] || [];
+
+    if (activeTag === 'All') {
+      return habits;
+    }
+
+    return habits.filter(
+      (habit: Habit) =>
+        (activeTag === 'Daily Routine' && (habit.emoji === '📝' || habit.emoji === '📖')) ||
+        (activeTag === 'Study Routine' && habit.emoji === '📚'),
+    );
+  }, [habitsByDate, activeDate, activeTag]);
+
+  const formattedActiveDate = useMemo(() => formatDate(activeDate), [activeDate]);
+
+  const handleDayPress = useCallback((fullDate: string) => {
+    setActiveDate(fullDate);
+  }, []);
+
   const handleHabitPress = useCallback(
-    (id: string) => {
+    async (id: string) => {
+      const habitToUpdate = habitsByDate[activeDate]?.find((h: Habit) => h.id === id);
+
+      if (!habitToUpdate) return;
+
       setHabitsByDate(prev => {
-        // Copy current state
         const updated = { ...prev };
 
-        // Update only habits for selected date
         if (updated[activeDate]) {
-          updated[activeDate] = updated[activeDate].map(habit =>
+          updated[activeDate] = updated[activeDate].map((habit: Habit) =>
             habit.id === id ? { ...habit, completed: !habit.completed } : habit,
           );
         }
 
         return updated;
       });
-      console.log(`Habit pressed: ${id}`);
+
+      try {
+        await updateHabitStatus(id, !habitToUpdate.completed);
+      } catch (error) {
+        console.error('Error updating habit status:', error);
+        setHabitsByDate(prev => {
+          const updated = { ...prev };
+
+          if (updated[activeDate]) {
+            updated[activeDate] = updated[activeDate].map((habit: Habit) =>
+              habit.id === id ? { ...habit, completed: habitToUpdate.completed } : habit,
+            );
+          }
+
+          return updated;
+        });
+      }
     },
-    [activeDate],
+    [habitsByDate, activeDate],
   );
+
+  // Handler for tag filter
+  const handleTagPress = useCallback((tag: string) => {
+    setActiveTag(tag);
+  }, []);
 
   return (
     <GradientContainer vertical>
@@ -91,14 +151,34 @@ export const HomeScreen = () => {
 
             {/* Filters */}
             <View style={styles.filtersContainer}>
-              <FilterChip label="All" isActive={true} />
-              <FilterChip label="Daily Routine" isActive={false} />
-              <FilterChip label="Study Routine" isActive={false} />
+              <FilterChip
+                label="All"
+                isActive={activeTag === 'All'}
+                onPress={() => handleTagPress('All')}
+              />
+              <FilterChip
+                label="Daily Routine"
+                isActive={activeTag === 'Daily Routine'}
+                onPress={() => handleTagPress('Daily Routine')}
+              />
+              <FilterChip
+                label="Study Routine"
+                isActive={activeTag === 'Study Routine'}
+                onPress={() => handleTagPress('Study Routine')}
+              />
             </View>
           </View>
 
-          {/* Display list of habits or empty state */}
-          {activeHabits.length === 0 ? (
+          {/* Display list of habits or loading/empty state */}
+          {isLoading ? (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="large" color="rgba(186, 104, 200, 0.8)" />
+            </View>
+          ) : loadError ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{loadError}</Text>
+            </View>
+          ) : activeHabits.length === 0 ? (
             <View style={styles.emptyStateContainer}>
               <EmptyStateIllustration useSvg={true} size={340} />
             </View>
@@ -159,5 +239,27 @@ const styles = StyleSheet.create({
   },
   habitListContainer: {
     flex: 1,
+  },
+  loaderContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loaderText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: 'rgba(0, 0, 0, 0.6)',
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 56,
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'rgba(255, 0, 0, 0.8)',
+    textAlign: 'center',
+    marginBottom: 16,
   },
 });
