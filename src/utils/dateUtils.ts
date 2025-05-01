@@ -7,6 +7,15 @@ export interface WeekDay {
   isToday: boolean;
 }
 
+export interface CalendarDay {
+  day: string;
+  date: string;
+  currentMonth: boolean;
+  fullDate: string;
+  isToday: boolean;
+  selected?: boolean;
+}
+
 export interface Habit {
   id: string;
   title: string;
@@ -36,6 +45,47 @@ export const getWeekDates = (): WeekDay[] => {
 };
 
 /**
+ * Get all days for a month's calendar view, including days from prev/next month to fill the grid
+ * @param date Optional date to specify which month to display. Defaults to current month.
+ * @returns Array of CalendarDay objects
+ */
+export const getMonthDays = (date?: string): CalendarDay[] => {
+  const targetDate = date ? moment(date) : moment();
+  const today = moment();
+  const startOfMonth = targetDate.clone().startOf('month');
+  const startOfCalendar = startOfMonth.clone().startOf('isoWeek');
+  const endOfMonth = targetDate.clone().endOf('month');
+  const endOfCalendar = endOfMonth.clone().endOf('isoWeek');
+  const daysToDisplay = endOfCalendar.diff(startOfCalendar, 'days') + 1;
+  return Array.from({ length: daysToDisplay }).map((_, i) => {
+    const date = startOfCalendar.clone().add(i, 'days');
+    const isCurrentMonth = date.month() === targetDate.month();
+    const isToday = date.isSame(today, 'day');
+
+    return {
+      day: date.format('ddd'), // Mon, Tue...
+      date: date.format('D'), // 1, 2, 3...
+      currentMonth: isCurrentMonth,
+      fullDate: date.format('YYYY-MM-DD'),
+      isToday,
+    };
+  });
+};
+
+/**
+ * Get an object with month and year for display in the calendar
+ * @param date Optional date to specify which month to display. Defaults to current month.
+ * @returns Object with month name and year
+ */
+export const getMonthData = (date?: string) => {
+  const targetDate = date ? moment(date) : moment();
+  return {
+    month: targetDate.format('MMMM'),
+    year: targetDate.format('YYYY'),
+  };
+};
+
+/**
  * Generates a unique ID for a habit using the current timestamp and a random number
  */
 export const generateHabitId = (): string => {
@@ -47,6 +97,13 @@ export const generateHabitId = (): string => {
  */
 export const formatDate = (date: string): string => {
   return moment(date).format('DD MMM YYYY');
+};
+
+/**
+ * Formats the date for display in header with day of week (February, 15th, Thu)
+ */
+export const formatDateWithDay = (date: string): string => {
+  return moment(date).format('MMMM, Do, ddd');
 };
 
 /**
