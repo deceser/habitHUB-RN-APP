@@ -25,10 +25,10 @@ export const LoginScreen = () => {
 
   return (
     <View style={commonStyles.container}>
-      {/* Градиентный фон */}
+      {/* Gradient background */}
       <LinearGradient {...verticalGradientConfig} style={StyleSheet.absoluteFillObject} />
 
-      {/* Размытые элементы фона */}
+      {/* Blurred background elements */}
       <BackgroundBlur />
 
       <StatusBar barStyle="dark-content" />

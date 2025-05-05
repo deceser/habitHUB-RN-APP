@@ -134,21 +134,21 @@ export const NewTaskScreen: React.FC = () => {
   const handleCreateTask = async () => {
     // Check if task name is present
     if (!taskName.trim()) {
-      Alert.alert('Ошибка', 'Введите название задачи');
+      Alert.alert('Error', 'Enter the task name');
       return;
     }
 
     // Check if any days selected for weekly tasks
     if (selectedRepeatType === 'Weekly' && selectedDays.length === 0) {
-      Alert.alert('Ошибка', 'Выберите хотя бы один день недели');
+      Alert.alert('Error', 'Select at least one day of the week');
       return;
     }
 
     // Check network connection
     if (!networkAvailable) {
       Alert.alert(
-        'Нет подключения',
-        'Отсутствует подключение к интернету. Задача будет создана, когда подключение восстановится.',
+        'No connection',
+        'No internet connection. The task will be created when the connection is restored.',
         [{ text: 'OK' }],
       );
       return;
@@ -161,8 +161,8 @@ export const NewTaskScreen: React.FC = () => {
       const { connected, error: connectionError } = await checkConnection();
       if (!connected) {
         Alert.alert(
-          'Ошибка подключения',
-          `Не удалось подключиться к серверу: ${connectionError || 'неизвестная ошибка'}. Пожалуйста, попробуйте позже.`,
+          'Connection error',
+          `Failed to connect to the server: ${connectionError || 'unknown error'}. Please try again later.`,
           [{ text: 'OK' }],
         );
         setIsLoading(false);
@@ -191,10 +191,10 @@ export const NewTaskScreen: React.FC = () => {
             ? error.message || JSON.stringify(error)
             : String(error);
 
-        Alert.alert('Ошибка создания задачи', `Не удалось сохранить задачу: ${errorDetails}`, [
-          { text: 'Отмена' },
+        Alert.alert('Error creating task', `Failed to save the task: ${errorDetails}`, [
+          { text: 'Cancel' },
           {
-            text: 'Повторить',
+            text: 'Retry',
             onPress: () => handleCreateTask(),
           },
         ]);
@@ -206,12 +206,11 @@ export const NewTaskScreen: React.FC = () => {
         navigation.goBack();
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Произошла непредвиденная ошибка';
-      Alert.alert('Ошибка', `Не удалось создать задачу: ${errorMessage}`, [
-        { text: 'Отмена' },
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      Alert.alert('Error', `Failed to create a task: ${errorMessage}`, [
+        { text: 'Cancel' },
         {
-          text: 'Повторить',
+          text: 'Retry',
           onPress: () => handleCreateTask(),
         },
       ]);
@@ -342,7 +341,7 @@ export const NewTaskScreen: React.FC = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Days of week - отображаем только для Weekly */}
+            {/* Days of week - display only for Weekly */}
             {selectedRepeatType === 'Weekly' && (
               <View style={styles.daysContainer}>
                 {DAYS_OF_WEEK.map((day, index) => (
@@ -399,7 +398,7 @@ export const NewTaskScreen: React.FC = () => {
 
           {/* Create Task button */}
           <Button
-            title={isLoading ? 'Создание...' : 'Create Task'}
+            title={isLoading ? 'Creating...' : 'Create Task'}
             onPress={handleCreateTask}
             style={styles.createButton}
             disabled={isLoading || !taskName.trim()}
@@ -412,7 +411,7 @@ export const NewTaskScreen: React.FC = () => {
             <View style={styles.networkWarning}>
               <MaterialIcons name="wifi-off" size={20} color="#D32F2F" />
               <Text style={styles.networkWarningText}>
-                Нет подключения к интернету. Задача не будет сохранена.
+                No internet connection. The task will not be saved.
               </Text>
             </View>
           )}

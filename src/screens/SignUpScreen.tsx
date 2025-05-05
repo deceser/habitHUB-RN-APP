@@ -72,15 +72,15 @@ export const SignUpScreen = () => {
         const { success, error } = await signUp(email, password, name);
 
         if (!success) {
-          setLocalError(error || 'Ошибка при регистрации');
+          setLocalError(error || 'Registration error');
         } else {
-          // Успешная регистрация, перенаправляем на MainTabs
-          // В реальной жизни здесь может быть подтверждение email или другие шаги
+          // Successful registration, redirect to MainTabs
+          // In real life, this could be email verification or other steps
           navigation.navigate('MainTabs');
         }
       } catch (error) {
-        setLocalError('Произошла непредвиденная ошибка');
-        console.error('Ошибка при регистрации:', error);
+        setLocalError('An unexpected error occurred');
+        console.error('Registration error:', error);
       } finally {
         setIsSubmitting(false);
       }
@@ -165,7 +165,7 @@ export const SignUpScreen = () => {
           />
 
           <Button
-            title={isSubmitting ? 'Регистрация...' : signUpContent.buttons.createAccount}
+            title={isSubmitting ? 'Registration...' : signUpContent.buttons.createAccount}
             onPress={handleSignUp}
             style={formStyles.buttonMargin}
             disabled={isSubmitting}

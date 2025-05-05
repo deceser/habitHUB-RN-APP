@@ -22,7 +22,7 @@ export const ForgotPasswordScreen = () => {
   const [localError, setLocalError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Используем контекст авторизации
+  // Use the authentication context
   const { forgotPassword, error: authError } = useAuth();
 
   // Use hooks for scroll control and form validation
@@ -61,12 +61,12 @@ export const ForgotPasswordScreen = () => {
           setLocalError(error || forgotPasswordContent.errors.serverError);
         } else {
           setIsSuccess(true);
-          // Очищаем поле email после успешной отправки
+          // Clear the email field after successful submission
           setEmail('');
         }
       } catch (error) {
         setLocalError(forgotPasswordContent.errors.serverError);
-        console.error('Ошибка при сбросе пароля:', error);
+        console.error('Error resetting password:', error);
       } finally {
         setIsSubmitting(false);
       }
@@ -124,7 +124,7 @@ export const ForgotPasswordScreen = () => {
           />
 
           <Button
-            title={isSubmitting ? 'Отправка...' : forgotPasswordContent.buttons.resetPassword}
+            title={isSubmitting ? 'Sending...' : forgotPasswordContent.buttons.resetPassword}
             onPress={handleResetPassword}
             style={formStyles.buttonMargin}
             disabled={isSubmitting}

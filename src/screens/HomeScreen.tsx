@@ -24,26 +24,26 @@ import { homeContent } from '../constants/content';
 import { useAuth } from '../context/AuthContext';
 
 export const HomeScreen = () => {
-  // Получаем данные пользователя из AuthContext
+  // Get user data from AuthContext
   const { user } = useAuth();
 
-  // Получаем дни текущей недели
+  // Get days of the current week
   const weekDays = useMemo(() => getWeekDates(), []);
 
-  // Устанавливаем активную дату (по умолчанию - сегодня)
+  // Set the active date (default - today)
   const [activeDate, setActiveDate] = useState<string>(() => {
     const today = weekDays.find(day => day.isToday);
     return today ? today.fullDate : weekDays[0].fullDate;
   });
 
-  // Создаем состояние для хранения привычек по датам
+  // Create state to store habits by dates
   const [habitsByDate, setHabitsByDate] = useState<HabitsByDate>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [activeTag, setActiveTag] = useState<string>('All');
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Загружаем привычки для текущей недели из Supabase
+  // Load habits for the current week from Supabase
   const loadHabits = useCallback(
     async (refresh = false) => {
       if (refresh) {
@@ -54,14 +54,14 @@ export const HomeScreen = () => {
       setLoadError(null);
 
       try {
-        // Получаем первый и последний день недели
+        // Get the first and last day of the week
         const firstDay = weekDays[0].fullDate;
         const lastDay = weekDays[6].fullDate;
 
-        // Получаем задачи за неделю из Supabase
+        // Get tasks for the week from Supabase
         const habits = await getHabitsForWeek(firstDay, lastDay);
 
-        // Устанавливаем полученные задачи в состояние
+        // Set the received tasks in the state
         setHabitsByDate(habits);
       } catch (error) {
         console.error('Error loading habits:', error);
@@ -74,14 +74,14 @@ export const HomeScreen = () => {
     [weekDays],
   );
 
-  // Обновляем задачи при фокусе экрана
+  // Update tasks when the screen is focused
   useFocusEffect(
     useCallback(() => {
       loadHabits();
     }, [loadHabits]),
   );
 
-  // Получаем задачи для активной даты и фильтруем по тегу, если необходимо
+  // Get tasks for the active date and filter by tag if necessary
   const activeHabits = useMemo(() => {
     const habits = habitsByDate[activeDate] || [];
 
@@ -89,7 +89,7 @@ export const HomeScreen = () => {
       return habits;
     }
 
-    // Фильтруем задачи по тегу
+    // Filter tasks by tag
     return habits.filter((habit: Habit) => {
       if (activeTag === homeContent.filters.dailyRoutine) {
         return habit.emoji === '📝' || habit.emoji === '📖';
@@ -104,23 +104,23 @@ export const HomeScreen = () => {
     });
   }, [habitsByDate, activeDate, activeTag]);
 
-  // Форматируем дату для отображения
+  // Format the date for display
   const formattedActiveDate = useMemo(() => formatDate(activeDate), [activeDate]);
 
-  // Обработчик нажатия на день
+  // Handler for clicking on a day
   const handleDayPress = useCallback((fullDate: string) => {
     setActiveDate(fullDate);
   }, []);
 
-  // Обработчик нажатия на привычку - обновляет статус выполнения задачи
+  // Handler for clicking on a habit - updates the status of the task
   const handleHabitPress = useCallback(
     async (id: string) => {
-      // Находим привычку в текущем состоянии
+      // Find the habit in the current state
       const habitToUpdate = habitsByDate[activeDate]?.find((h: Habit) => h.id === id);
 
       if (!habitToUpdate) return;
 
-      // Обновляем локальное состояние для моментальной обратной связи
+      // Update the local state for immediate feedback
       setHabitsByDate(prev => {
         const updated = { ...prev };
 
@@ -133,12 +133,12 @@ export const HomeScreen = () => {
         return updated;
       });
 
-      // Отправляем обновление в Supabase
+      // Send the update to Supabase
       try {
         await updateHabitStatus(id, !habitToUpdate.completed);
       } catch (error) {
         console.error('Error updating habit status:', error);
-        // В случае ошибки возвращаем предыдущее состояние
+        // In case of an error, return the previous state
         setHabitsByDate(prev => {
           const updated = { ...prev };
 
@@ -155,12 +155,12 @@ export const HomeScreen = () => {
     [habitsByDate, activeDate],
   );
 
-  // Обработчик фильтра по тегу
+  // Handler for filtering by tag
   const handleTagPress = useCallback((tag: string) => {
     setActiveTag(tag);
   }, []);
 
-  // Обработчик обновления при pull-to-refresh
+  // Handler for refreshing when pull-to-refresh
   const handleRefresh = useCallback(() => {
     loadHabits(true);
   }, [loadHabits]);
@@ -174,7 +174,7 @@ export const HomeScreen = () => {
           refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
         >
           <View style={styles.headerContainer}>
-            {/* Дни недели */}
+            {/* Days of the week */}
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -192,7 +192,7 @@ export const HomeScreen = () => {
               ))}
             </ScrollView>
 
-            {/* Фильтры */}
+            {/* Filters */}
             <View style={styles.filtersContainer}>
               <FilterChip
                 label={homeContent.filters.all}
@@ -217,7 +217,7 @@ export const HomeScreen = () => {
             </View>
           </View>
 
-          {/* Отображаем список привычек или состояние загрузки/пустого списка */}
+          {/* Display the list of habits or loading/empty list state */}
           {isLoading ? (
             <View style={styles.loaderContainer}>
               <ActivityIndicator size="large" color="rgba(186, 104, 200, 0.8)" />
@@ -241,7 +241,7 @@ export const HomeScreen = () => {
           )}
         </ScrollView>
 
-        {/* Кнопка добавления */}
+        {/* Add button */}
         <FloatingActionButton />
       </SafeAreaView>
     </GradientContainer>

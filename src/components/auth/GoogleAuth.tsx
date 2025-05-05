@@ -4,7 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { SocialButton } from '../ui/SocialButton';
 import { supabase } from '../../lib/supabase';
 
-// Закрываем браузерную сессию после авторизации
+// Close the browser session after authorization
 WebBrowser.maybeCompleteAuthSession();
 
 interface GoogleAuthProps {

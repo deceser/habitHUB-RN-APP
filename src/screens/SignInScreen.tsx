@@ -62,14 +62,14 @@ export const SignInScreen = () => {
         const { success, error } = await signIn(email, password);
 
         if (!success) {
-          setLocalError(error || 'Ошибка при входе');
+          setLocalError(error || 'Login error');
         } else {
-          // Успешный вход, будет автоматически перенаправлен через AuthProvider
+          // Successful login, will be automatically redirected through AuthProvider
           navigation.navigate('MainTabs');
         }
       } catch (error) {
-        setLocalError('Произошла непредвиденная ошибка');
-        console.error('Ошибка при входе:', error);
+        setLocalError('An unexpected error occurred');
+        console.error('Login error:', error);
       } finally {
         setIsSubmitting(false);
       }
@@ -136,7 +136,7 @@ export const SignInScreen = () => {
           </TouchableOpacity>
 
           <Button
-            title={isSubmitting ? 'Вход...' : signInContent.buttons.signIn}
+            title={isSubmitting ? 'Login...' : signInContent.buttons.signIn}
             onPress={handleSignIn}
             style={formStyles.buttonMargin}
             disabled={isSubmitting}

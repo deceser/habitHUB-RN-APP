@@ -45,7 +45,7 @@ export const AppNavigator = () => {
         }}
         initialRouteName={initialRoute}
       >
-        {user ? (
+        {!user ? (
           // Авторизованные маршруты
           <>
             <Stack.Screen name="MainTabs" component={TabNavigator} />

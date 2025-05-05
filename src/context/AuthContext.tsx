@@ -62,8 +62,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await saveUserToDatabase(data.session.user);
         }
       } catch (error) {
-        console.error('Ошибка при получении начальной сессии:', error);
-        setError('Не удалось загрузить данные авторизации');
+        console.error('Error fetching initial session:', error);
+        setError('Failed to load authorization data');
       } finally {
         setLoading(false);
       }
@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           {
             id: user.id,
             email: user.email,
-            name: user.user_metadata?.name || 'Пользователь',
+            name: user.user_metadata?.name || 'User',
           },
         ]);
 
@@ -134,7 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         let errorMessage = error.message;
         // Handling known errors
         if (error.message.includes('already')) {
-          errorMessage = 'Пользователь с таким email уже существует';
+          errorMessage = 'User with this email already exists';
         }
         setError(errorMessage);
         return { success: false, error: errorMessage };
@@ -142,7 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return { success: true, error: null };
     } catch (err: any) {
-      const errorMessage = err.message || 'Ошибка при регистрации';
+      const errorMessage = err.message || 'Error registering';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -162,7 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         let errorMessage = error.message;
         // Handling known errors
         if (error.message.includes('Invalid login credentials')) {
-          errorMessage = 'Неверный email или пароль';
+          errorMessage = 'Invalid email or password';
         }
         setError(errorMessage);
         return { success: false, error: errorMessage };
@@ -170,7 +170,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return { success: true, error: null };
     } catch (err: any) {
-      const errorMessage = err.message || 'Ошибка при входе';
+      const errorMessage = err.message || 'Error logging in';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -186,12 +186,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { success, error } = await logoutUser();
 
       if (error) {
-        setError('Ошибка при выходе');
-        console.error('Ошибка при выходе:', error);
+        setError('Error logging out');
+        console.error('Error logging out:', error);
       }
     } catch (err: any) {
-      setError('Непредвиденная ошибка при выходе');
-      console.error('Непредвиденная ошибка при выходе:', err);
+      setError('Unexpected error logging out');
+      console.error('Unexpected error logging out:', err);
     } finally {
       setLoading(false);
     }
@@ -213,7 +213,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return { success: true, error: null };
     } catch (err: any) {
-      const errorMessage = err.message || 'Ошибка при сбросе пароля';
+      const errorMessage = err.message || 'Error resetting password';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -221,7 +221,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Предоставляем состояние и функции через контекст
+  // Provide the state and functions through the context
   return (
     <AuthContext.Provider
       value={{
@@ -240,11 +240,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-// Хук для использования контекста авторизации
+// Hook for using the authentication context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth должен использоваться внутри AuthProvider');
+    throw new Error('useAuth must be used inside AuthProvider');
   }
   return context;
 };
