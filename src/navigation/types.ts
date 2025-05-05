@@ -6,6 +6,7 @@ export type RootStackParamList = {
   Login: undefined;
   SignIn: undefined;
   SignUp: undefined;
+  ForgotPassword: undefined;
   MainTabs: undefined;
   Details: { id: string };
   NewTask: undefined;

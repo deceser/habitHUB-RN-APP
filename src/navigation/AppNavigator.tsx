@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { LoginScreen } from '../screens/LoginScreen';
 import { SignInScreen } from '../screens/SignInScreen';
 import { SignUpScreen } from '../screens/SignUpScreen';
+import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
 import { NewTaskScreen } from '../screens/NewTaskScreen';
 
 import { RootStackParamList } from './types';
@@ -21,13 +22,13 @@ export const AppNavigator = () => {
   const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | null>(null);
 
   useEffect(() => {
-    // Detect the initial route based on the authentication status
+    // Определяем начальный маршрут на основе статуса аутентификации
     if (!loading) {
-      setInitialRoute(!user ? 'MainTabs' : 'Login');
+      setInitialRoute(user ? 'MainTabs' : 'Login');
     }
   }, [user, loading]);
 
-  // Show the loading screen while checking the authentication status
+  // Отображаем экран загрузки пока проверяем статус аутентификации
   if (loading || initialRoute === null) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -44,19 +45,28 @@ export const AppNavigator = () => {
         }}
         initialRouteName={initialRoute}
       >
-        <Stack.Screen name="MainTabs" component={TabNavigator} />
-        <Stack.Screen
-          name="NewTask"
-          component={NewTaskScreen}
-          options={{
-            presentation: 'fullScreenModal',
-            animation: 'slide_from_bottom',
-          }}
-        />
-
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="SignIn" component={SignInScreen} />
-        <Stack.Screen name="SignUp" component={SignUpScreen} />
+        {!user ? (
+          // Авторизованные маршруты
+          <>
+            <Stack.Screen name="MainTabs" component={TabNavigator} />
+            <Stack.Screen
+              name="NewTask"
+              component={NewTaskScreen}
+              options={{
+                presentation: 'fullScreenModal',
+                animation: 'slide_from_bottom',
+              }}
+            />
+          </>
+        ) : (
+          // Неавторизованные маршруты
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="SignIn" component={SignInScreen} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
