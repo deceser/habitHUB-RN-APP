@@ -33,4 +33,36 @@ export const formStyles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
+  linkText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#9747FF',
+    textDecorationLine: 'underline',
+  },
+  secondaryLinkContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  secondaryLinkText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#9747FF',
+    marginHorizontal: 5,
+  },
+  errorContainer: {
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 16,
+  },
+  errorText: {
+    color: '#D32F2F',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  loader: {
+    marginVertical: 10,
+  },
 });

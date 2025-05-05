@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackScreenProps } from '../../navigation/types';
 
 interface FloatingActionButtonProps {
@@ -10,6 +10,12 @@ interface FloatingActionButtonProps {
 
 export const FloatingActionButton = ({ onPress, label = '+' }: FloatingActionButtonProps) => {
   const navigation = useNavigation<RootStackScreenProps<'MainTabs'>['navigation']>();
+  const route = useRoute();
+
+  // Hide the FAB on the Profile screen
+  if (route.name === 'Profile') {
+    return null;
+  }
 
   const handlePress = () => {
     if (onPress) {

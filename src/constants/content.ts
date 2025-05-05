@@ -38,6 +38,11 @@ export const signInContent = {
   buttons: {
     signIn: 'Sign In',
     forgotPassword: 'Forgot password?',
+    createAccount: "Don't have an account? Sign up",
+  },
+  errors: {
+    invalidCredentials: 'Invalid email or password',
+    serverError: 'Server error. Please try again later',
   },
 };
 
@@ -77,6 +82,48 @@ export const signUpContent = {
   buttons: {
     createAccount: 'Create Account',
     haveAccount: 'Already have an account? Login',
+  },
+  errors: {
+    emailExists: 'Email already exists',
+    serverError: 'Server error. Please try again later',
+  },
+};
+
+// Forgot password screen content
+export const forgotPasswordContent = {
+  title: 'Forgot Password',
+  subtitle: 'Enter your email to receive password reset instructions',
+  fields: {
+    email: {
+      placeholder: 'Email',
+      errors: {
+        required: 'Email is required',
+        invalid: 'Please enter a valid email',
+      },
+    },
+  },
+  buttons: {
+    resetPassword: 'Reset Password',
+    backToLogin: 'Back to Login',
+  },
+  success: 'Reset instructions have been sent to your email',
+  errors: {
+    emailNotFound: 'Email not found',
+    serverError: 'Server error. Please try again later',
+  },
+};
+
+// Home screen content
+export const homeContent = {
+  emptyState: 'No tasks for this day',
+  loading: 'Loading tasks...',
+  error: 'Failed to load tasks. Check your connection.',
+  filters: {
+    all: 'All',
+    dailyRoutine: 'Daily Routine',
+    studyRoutine: 'Study Routine',
+    fitness: 'Fitness',
+    work: 'Work',
   },
 };
 
