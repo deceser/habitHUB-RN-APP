@@ -2,17 +2,12 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import { HomeScreen } from '../screens/HomeScreen';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { TabParamList } from './types';
 import { CalendarScreen } from '../screens/CalendarScreen';
+import { ProfileScreen } from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
-
-const ProfileScreen = () => (
-  <View style={styles.placeholder}>
-    <Text>Profile Screen</Text>
-  </View>
-);
 
 export const TabNavigator = () => {
   return (

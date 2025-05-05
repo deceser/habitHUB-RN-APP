@@ -1,19 +1,25 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-interface FilterChipProps {
+export interface FilterChipProps {
   label: string;
   isActive: boolean;
+  onPress?: () => void;
 }
 
-export const FilterChip = ({ label, isActive }: FilterChipProps) => (
-  <View style={[styles.filterChip, isActive ? styles.activeFilterChip : styles.inactiveFilterChip]}>
+export const FilterChip: React.FC<FilterChipProps> = ({ label, isActive, onPress }) => (
+  <TouchableOpacity
+    style={[styles.filterChip, isActive ? styles.activeFilterChip : styles.inactiveFilterChip]}
+    onPress={onPress}
+    activeOpacity={0.7}
+    disabled={!onPress}
+  >
     <Text
       style={[styles.filterText, isActive ? styles.activeFilterText : styles.inactiveFilterText]}
     >
       {label}
     </Text>
-  </View>
+  </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
