@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, TextInput, StyleSheet, Text, TouchableOpacity, TextInputProps } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { theme } from '../../constants/theme';
 
-interface InputFieldProps {
+export interface InputFieldProps extends Omit<TextInputProps, 'style'> {
   placeholder: string;
   value: string;
   onChangeText: (text: string) => void;
@@ -19,6 +19,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   secureTextEntry = false,
   icon,
   error,
+  ...restProps
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const actualSecureTextEntry = secureTextEntry && !isPasswordVisible;
@@ -36,6 +37,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           value={value}
           onChangeText={onChangeText}
           secureTextEntry={actualSecureTextEntry}
+          {...restProps}
         />
         {secureTextEntry && (
           <TouchableOpacity

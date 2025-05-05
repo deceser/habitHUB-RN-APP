@@ -1,13 +1,22 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { registerUser, loginUser, logoutUser, resetPassword } from '../services/authService';
 
 // Types for the authentication context
 interface AuthContextProps {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  signUp: (
+    email: string,
+    password: string,
+    name: string,
+  ) => Promise<{ success: boolean; error: any }>;
+  signIn: (email: string, password: string) => Promise<{ success: boolean; error: any }>;
   signOut: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; error: any }>;
+  error: string | null;
 }
 
 // Creating the context with initial values
@@ -15,7 +24,11 @@ const AuthContext = createContext<AuthContextProps>({
   session: null,
   user: null,
   loading: true,
+  signUp: async () => ({ success: false, error: null }),
+  signIn: async () => ({ success: false, error: null }),
   signOut: async () => {},
+  forgotPassword: async () => ({ success: false, error: null }),
+  error: null,
 });
 
 // Props for the authentication provider
@@ -28,6 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Effect for initializing and tracking the authentication state
   useEffect(() => {
@@ -49,6 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       } catch (error) {
         console.error('Ошибка при получении начальной сессии:', error);
+        setError('Не удалось загрузить данные авторизации');
       } finally {
         setLoading(false);
       }
@@ -96,6 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           {
             id: user.id,
             email: user.email,
+            name: user.user_metadata?.name || 'Пользователь',
           },
         ]);
 
@@ -106,18 +122,119 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Function to register a new user
+  const signUp = async (email: string, password: string, name: string) => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      const { data, error } = await registerUser(email, password, name);
+
+      if (error) {
+        let errorMessage = error.message;
+        // Handling known errors
+        if (error.message.includes('already')) {
+          errorMessage = 'Пользователь с таким email уже существует';
+        }
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+
+      return { success: true, error: null };
+    } catch (err: any) {
+      const errorMessage = err.message || 'Ошибка при регистрации';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to sign in a user
+  const signIn = async (email: string, password: string) => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      const { data, error } = await loginUser(email, password);
+
+      if (error) {
+        let errorMessage = error.message;
+        // Handling known errors
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = 'Неверный email или пароль';
+        }
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+
+      return { success: true, error: null };
+    } catch (err: any) {
+      const errorMessage = err.message || 'Ошибка при входе';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Function to sign out the user
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Ошибка при выходе:', error);
+      setLoading(true);
+      setError(null);
+      const { success, error } = await logoutUser();
+
+      if (error) {
+        setError('Ошибка при выходе');
+        console.error('Ошибка при выходе:', error);
+      }
+    } catch (err: any) {
+      setError('Непредвиденная ошибка при выходе');
+      console.error('Непредвиденная ошибка при выходе:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to reset the password
+  const forgotPassword = async (email: string) => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      const { data, error } = await resetPassword(email);
+
+      if (error) {
+        let errorMessage = error.message;
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+
+      return { success: true, error: null };
+    } catch (err: any) {
+      const errorMessage = err.message || 'Ошибка при сбросе пароля';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
     }
   };
 
   // Предоставляем состояние и функции через контекст
   return (
-    <AuthContext.Provider value={{ session, user, loading, signOut }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        user,
+        loading,
+        signOut,
+        signUp,
+        signIn,
+        forgotPassword,
+        error,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

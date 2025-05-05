@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Button } from '../components/ui/Button';
-import { SocialAuth } from '../components/auth/SocialAuth';
-import { signInContent } from '../constants/content';
 import { InputField } from '../components/ui/InputField';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackScreenProps } from '../navigation/types';
@@ -12,18 +10,20 @@ import { useFormValidation } from '../hooks/useFormValidation';
 import { formStyles } from '../styles/formStyles';
 import { Keyboard } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { MaterialIcons } from '@expo/vector-icons';
+import { forgotPasswordContent } from '../constants/content';
 
-type SignInScreenNavigationProp = RootStackScreenProps<'SignIn'>['navigation'];
+type ForgotPasswordScreenNavigationProp = RootStackScreenProps<'ForgotPassword'>['navigation'];
 
-export const SignInScreen = () => {
-  const navigation = useNavigation<SignInScreenNavigationProp>();
+export const ForgotPasswordScreen = () => {
+  const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Используем контекст авторизации
-  const { signIn, error: authError } = useAuth();
+  const { forgotPassword, error: authError } = useAuth();
 
   // Use hooks for scroll control and form validation
   const { scrollViewRef, scrollEnabled, handleScrollEnd, scrollToTop } = useScrollControl();
@@ -32,24 +32,20 @@ export const SignInScreen = () => {
   // Validation rules for fields
   const validationRules = {
     email: { required: true, email: true },
-    password: { required: true, minLength: 6 },
   };
 
-  const handleSignIn = async () => {
+  const handleResetPassword = async () => {
     Keyboard.dismiss();
     setLocalError(null);
+    setIsSuccess(false);
 
     const isValid = validateForm(
-      { email, password },
+      { email },
       validationRules,
       {
         email: {
-          required: signInContent.fields.email.errors.required,
-          email: signInContent.fields.email.errors.invalid,
-        },
-        password: {
-          required: signInContent.fields.password.errors.required,
-          minLength: signInContent.fields.password.errors.short,
+          required: forgotPasswordContent.fields.email.errors.required,
+          email: forgotPasswordContent.fields.email.errors.invalid,
         },
       },
       { scrollToTop },
@@ -59,29 +55,26 @@ export const SignInScreen = () => {
       setIsSubmitting(true);
 
       try {
-        const { success, error } = await signIn(email, password);
+        const { success, error } = await forgotPassword(email);
 
         if (!success) {
-          setLocalError(error || 'Ошибка при входе');
+          setLocalError(error || forgotPasswordContent.errors.serverError);
         } else {
-          // Успешный вход, будет автоматически перенаправлен через AuthProvider
-          navigation.navigate('MainTabs');
+          setIsSuccess(true);
+          // Очищаем поле email после успешной отправки
+          setEmail('');
         }
       } catch (error) {
-        setLocalError('Произошла непредвиденная ошибка');
-        console.error('Ошибка при входе:', error);
+        setLocalError(forgotPasswordContent.errors.serverError);
+        console.error('Ошибка при сбросе пароля:', error);
       } finally {
         setIsSubmitting(false);
       }
     }
   };
 
-  const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword');
-  };
-
-  const handleCreateAccount = () => {
-    navigation.navigate('SignUp');
+  const goBack = () => {
+    navigation.goBack();
   };
 
   return (
@@ -92,10 +85,22 @@ export const SignInScreen = () => {
       onMomentumScrollEnd={handleScrollEnd}
     >
       <View style={formStyles.contentContainer}>
+        <TouchableOpacity onPress={goBack} style={{ position: 'absolute', top: 50, left: 20 }}>
+          <MaterialIcons name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+
         <View style={formStyles.titleContainer}>
-          <Text style={formStyles.title}>{signInContent.title}</Text>
-          <Text style={formStyles.subtitle}>{signInContent.subtitle}</Text>
+          <Text style={formStyles.title}>{forgotPasswordContent.title}</Text>
+          <Text style={formStyles.subtitle}>{forgotPasswordContent.subtitle}</Text>
         </View>
+
+        {isSuccess && (
+          <View style={[formStyles.errorContainer, { backgroundColor: 'rgba(0, 255, 0, 0.1)' }]}>
+            <Text style={[formStyles.errorText, { color: 'green' }]}>
+              {forgotPasswordContent.success}
+            </Text>
+          </View>
+        )}
 
         {(localError || authError) && (
           <View style={formStyles.errorContainer}>
@@ -105,7 +110,7 @@ export const SignInScreen = () => {
 
         <View style={formStyles.formContainer}>
           <InputField
-            placeholder={signInContent.fields.email.placeholder}
+            placeholder={forgotPasswordContent.fields.email.placeholder}
             value={email}
             onChangeText={text => {
               setEmail(text);
@@ -118,26 +123,9 @@ export const SignInScreen = () => {
             keyboardType="email-address"
           />
 
-          <InputField
-            placeholder={signInContent.fields.password.placeholder}
-            value={password}
-            onChangeText={text => {
-              setPassword(text);
-              clearError('password');
-              setLocalError(null);
-            }}
-            secureTextEntry
-            icon="lock"
-            error={errors.password}
-          />
-
-          <TouchableOpacity style={formStyles.linkContainer} onPress={handleForgotPassword}>
-            <Text style={formStyles.linkText}>{signInContent.buttons.forgotPassword}</Text>
-          </TouchableOpacity>
-
           <Button
-            title={isSubmitting ? 'Вход...' : signInContent.buttons.signIn}
-            onPress={handleSignIn}
+            title={isSubmitting ? 'Отправка...' : forgotPasswordContent.buttons.resetPassword}
+            onPress={handleResetPassword}
             style={formStyles.buttonMargin}
             disabled={isSubmitting}
           />
@@ -146,11 +134,9 @@ export const SignInScreen = () => {
             <ActivityIndicator size="large" color="#9747FF" style={formStyles.loader} />
           )}
 
-          <TouchableOpacity style={formStyles.secondaryLinkContainer} onPress={handleCreateAccount}>
-            <Text style={formStyles.secondaryLinkText}>{signInContent.buttons.createAccount}</Text>
+          <TouchableOpacity style={formStyles.linkContainer} onPress={goBack}>
+            <Text style={formStyles.linkText}>{forgotPasswordContent.buttons.backToLogin}</Text>
           </TouchableOpacity>
-
-          <SocialAuth />
         </View>
       </View>
     </FormContainer>

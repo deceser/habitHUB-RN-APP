@@ -9,6 +9,7 @@ export interface Task {
   tag_task: string;
   created_at?: string;
   completed?: boolean;
+  user_id?: string;
 }
 
 /**
